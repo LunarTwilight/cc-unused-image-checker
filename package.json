@@ -1,0 +1,23 @@
+{
+  "name": "cc-unused-image-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LunarTwilight/cc-unused-image-checker.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/LunarTwilight/cc-unused-image-checker/issues"
+  },
+  "homepage": "https://github.com/LunarTwilight/cc-unused-image-checker#readme",
+  "dependencies": {
+    "got": "^11.8.3",
+    "mx-color-logger": "^1.0.5"
+  }
+}
