@@ -32,8 +32,11 @@ require('mx-color-logger').init();
             return;
         }
         const unusedFiles = files.filter(item => !item.linkswhere && !item.transcludedin && !item.fileusage);
-        for (const item of unusedFiles) {
-            console.log(JSON.stringify(item));
-        }
+        bot.batchOperation(unusedFiles, page => {
+            return new Promise((resolve, reject) => {
+                console.log(JSON.stringify(page));
+                resolve();
+            });
+        });
     //});
 })();
