@@ -17,7 +17,6 @@ require('mx-color-logger').init();
     });
     //cron.schedule('0 0 * * *', () => {
         const timestamp = new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString();
-        console.log(timestamp);
         let files = [];
         for await (let json of bot.continuedQueryGen({
             action: 'query',
@@ -33,6 +32,5 @@ require('mx-color-logger').init();
             mwn.log('[I] No results, aborting run.');
             return;
         }
-        console.log(files);
     //});
 })();
