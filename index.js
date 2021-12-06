@@ -19,17 +19,21 @@ require('mx-color-logger').init();
         let files = [];
         for await (let json of bot.continuedQueryGen({
             action: 'query',
-            list: 'allimages',
-            aisort: 'timestamp',
-            aistart: timestamp,
-            ailimit: 'max'
+            generator: 'allimages',
+            gaisort: 'timestamp',
+            gaistart: timestamp,
+            gailimit: 'max',
+            prop: 'linkshere|transcludedin|fileusage'
         })) {
-            let res = json.query.allimages.map(item => item.name);
-            files = files.concat(res);
+            files = files.concat(json.query.pages);
         }
         if (!files.length) {
             mwn.log('[I] No results, aborting run.');
             return;
+        }
+        const unusedFiles = files.filter(item => !item.linkswhere && !item.transcludedin && !item.fileusage);
+        for (const item of unusedFiles) {
+            console.log(JSON.stringify(item));
         }
     //});
 })();
