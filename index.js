@@ -1,5 +1,4 @@
 const { username, botname, password, apiUrl } = require('./config.json');
-const got = require('got');
 const cron = require('node-cron');
 const { mwn } = require('mwn');
 
