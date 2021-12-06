@@ -19,6 +19,7 @@
   "dependencies": {
     "got": "^11.8.3",
     "mwn": "^1.11.4",
-    "mx-color-logger": "^1.0.5"
+    "mx-color-logger": "^1.0.5",
+    "node-cron": "^3.0.0"
   }
 }
