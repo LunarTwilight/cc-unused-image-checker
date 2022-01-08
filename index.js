@@ -2,7 +2,7 @@ const { username, botname, password, apiUrl } = require('./config.json');
 const cron = require('node-cron');
 const { mwn } = require('mwn');
 
-require('mx-color-logger').init();
+require('merida').init();
 
 (async () => {
     const bot = await mwn.init({
