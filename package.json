@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/LunarTwilight/cc-unused-image-checker#readme",
   "dependencies": {
-    "merida": "^2.0.1",
+    "merida": "^2.0.2",
     "mwn": "^1.11.4",
     "node-cron": "^3.0.0"
   }
