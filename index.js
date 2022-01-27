@@ -35,7 +35,7 @@ require('merida').init();
         })) {
             if (json.continue === '||linkshere|transcludedin|imageinfo|categories') {
                 for (const page of Object.values(json.query.pages)) {
-                    files[page.pageid] = Object.assign({}, files[page], page);
+                    files[page.pageid] = Object.assign({}, files[page.pageid], page);
                 }
             } else {
                 files = Object.assign({}, files, json.query.pages);
