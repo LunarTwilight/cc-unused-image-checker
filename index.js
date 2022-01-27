@@ -14,8 +14,8 @@ require('merida').init();
         },
         userAgent: 'cc-unused-image-checker'
     });
-    //cron.schedule('0 0 * * *', () => {
-        const timestamp = new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString();
+    //cron.schedule('0 0 */2 * *', () => {
+        const timestamp = new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString();
         let files = [];
         for await (let json of bot.continuedQueryGen({
             action: 'query',
