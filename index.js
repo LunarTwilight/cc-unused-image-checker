@@ -15,42 +15,55 @@ require('merida').init();
         userAgent: 'cc-unused-image-checker'
     });
     //cron.schedule('0 0 */2 * *', () => {
-        const timestamp = new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString();
-        let files = [];
+        const timestamps = {
+            start: new Date(Date.now() - (4 * 24 * 60 * 60 * 1000)).toISOString(),
+            end: new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString()
+        };
+        let files = {};
         for await (let json of bot.continuedQueryGen({
             action: 'query',
-            generator: 'allimages',
-            gaisort: 'timestamp',
-            gaistart: timestamp,
-            gailimit: 'max',
-            prop: 'linkshere|transcludedin|fileusage|imageinfo',
-            iiprop: 'timestamp|user'
+            list: 'allimages',
+            aisort: 'timestamp',
+            aistart: timestamps.start,
+            aiend: timestamps.end,
+            ailimit: 'max',
+            prop: 'linkshere|transcludedin|fileusage|imageinfo|categories',
+            cllimit: 1,
+            fulimit: 1,
+            lhlimit: 1,
+            tilimit: 1
         })) {
-            files = files.concat(json.query.pages);
+            if (json.continue === '||linkshere|transcludedin|imageinfo|categories') {
+                for (const page of Object.values(json.query.pages)) {
+                    files[page.pageid] = Object.assign({}, files[page], page);
+                }
+            } else {
+                files = Object.assign({}, files, json.query.pages);
+            }
         }
-        if (!files.length) {
+        if (!Object.keys(files).length) {
             mwn.log('[I] No results, aborting run.');
             return;
         }
-        const unusedFiles = files.filter(item => !item.linkswhere && !item.transcludedin && !item.fileusage);
+        for (const file of files) {
+            if (file.title.includes('SKATER')) {
+                console.log(JSON.stringify(file));
+            }
+        }
+        const unusedFiles = files.filter(item => !item.linkswhere && !item.transcludedin && !item.fileusage && !item.categories);
         bot.batchOperation(unusedFiles, page => {
             return new Promise((resolve, reject) => {
                 bot.request({
                     action: 'query',
                     list: 'users',
-                    usprop: 'groups|editcount',
-                    ususers: page.imageinfo.user,
-                    prop: 'categories',
-                    titles: page.title
+                    ususers: page.imageinfo[0].user,
+                    usprop: 'groups|editcount'
                 }).then(async data => {
                     if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join())) {
-                        resolve();
+                        return resolve(true);
                     }
                     if (data.query.users[0].editcount >= 50) {
-                        resolve();
-                    }
-                    if (data.query.pages[0].categories || data.query.pages[0].categories.length) {
-                        resolve();
+                        return resolve(true);
                     }
                     console.log(JSON.stringify(page));
                     /*await bot.delete(page.title, 'Deleting image that hasn\'t been used in 48 hours, if this is a mistake please contact [[Message wall:Sophiedp|Sophiedp]].');
@@ -64,6 +77,7 @@ require('merida').init();
                             'Content-Type': 'application/json'
                         }
                     });*/
+                    resolve(true);
                 }).catch(reject);
             });
         });
