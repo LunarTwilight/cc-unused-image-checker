@@ -31,7 +31,7 @@ const continuedQuery = async params => {
 }
 
 //https://stackoverflow.com/a/40486595
-function mergeByName (arr) {
+const mergeByName = arr => {
     return lodash(arr)
         .groupBy(item => item.pageid)
         .map(function (group) {
