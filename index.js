@@ -84,18 +84,18 @@ const mergeByName = arr => {
         cookieJar: jar
     }).json();
     await got.post(apiUrl, {
-        searchParams: {
+        form: new URLSearchParams({
             action: 'login',
             lgname: username,
             lgpassword: password,
             lgtoken: logonToken.query.tokens.logintoken,
             format: 'json'
-        },
+        }),
         headers: {
             'user-agent': pkg.name
         },
         cookieJar: jar
-    }).json();
+    });
     const csrfToken = await got(apiUrl, {
         searchParams: {
             action: 'query',
