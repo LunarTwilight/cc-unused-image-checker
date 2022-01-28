@@ -6,7 +6,7 @@ const lodash = require('lodash');
 const tough = require('tough-cookie');
 const jar = new tough.CookieJar();
 const pkg = require('./package.json');
-require('merida').init();
+//require('merida').init();
 
 //With help from https://github.com/siddharthvp/mwn/blob/3082515/src/bot.ts#L1477 and Doru's code
 const continuedQuery = async params => {
@@ -134,7 +134,7 @@ const mergeByName = arr => {
             setTimeout(async () => {
                 await got.post(webhookUrl, {
                     json: {
-                        content: `Deleting ${file.title} uploaded by ${file.imageinfo[0].user} uploaded ${file.imageinfo[0].timestamp}`
+                        content: `Deleting \`${file.title}\` uploaded by \`${file.imageinfo[0].user}\` uploaded \`${file.imageinfo[0].timestamp}\``
                     },
                     headers: {
                         'user-agent': pkg.name
@@ -145,7 +145,8 @@ const mergeByName = arr => {
                     form: new URLSearchParams({
                         action: 'delete',
                         title: file.title,
-                        token: csrfToken,
+                        token: csrfToken.query.tokens.csrftoken,
+                        reason: 'Deleting file that has been unused for 48 hours. If this is a mistake or you still need the file, please contact [[Message_wall:Sophiedp|Sophiedp]].',
                         format: 'json'
                     }),
                     headers: {
