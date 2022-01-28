@@ -107,44 +107,56 @@ const mergeByName = arr => {
         },
         cookieJar: jar
     }).json();
-    batch(unusedFiles, async file => {
-        const data = await got(apiUrl, {
-            searchParams: {
-                action: 'query',
-                list: 'users',
-                ususers: file.imageinfo[0].user,
-                usprop: 'groups|editcount'
-            },
-            headers: {
-                'user-agent': pkg.name
+    batch(unusedFiles, 10, file => {
+        return new Promise(async (resolve, reject) => {
+            const data = await got(apiUrl, {
+                searchParams: {
+                    action: 'query',
+                    list: 'users',
+                    ususers: file.imageinfo[0].user,
+                    usprop: 'groups|editcount',
+                    format: 'json'
+                },
+                headers: {
+                    'user-agent': pkg.name
+                }
+            }).json();
+            if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join()) || data.query.users[0].editcount >= 50) {
+                resolve();
             }
-        }).json();
-        if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join()) || data.query.users[0].editcount >= 50) {
-            return;
-        }
-        await got.post(webhookUrl, {
-            body: {
-                content: `Deleting ${file.title} uploaded by ${file.imageinfo[0].user} uploaded ${file.imageinfo[0].timestamp}`
-            },
-            headers: {
-                'user-agent': pkg.name
+            resolve(file);
+        });
+    }).catch(console.error).then(checkedFiles => {
+        for (const file of checkedFiles) {
+            if (!file) {
+                return;
             }
-        }).json();
-        //https://www.mediawiki.org/wiki/API:Delete#JavaScript helped here too
-        const deleteReq = await got.post(apiUrl, {
-            body: {
-                action: 'delete',
-                title: file.title,
-                token: csrfToken,
-                format: 'json'
-            },
-            headers: {
-                'user-agent': pkg.name
-            },
-            cookieJar: jar
-        }).json();
-        if (deleteReq.error) {
-            console.error(deleteReq.error)
+            setTimeout(async () => {
+                await got.post(webhookUrl, {
+                    json: {
+                        content: `Deleting ${file.title} uploaded by ${file.imageinfo[0].user} uploaded ${file.imageinfo[0].timestamp}`
+                    },
+                    headers: {
+                        'user-agent': pkg.name
+                    }
+                }).json();
+                //https://www.mediawiki.org/wiki/API:Delete#JavaScript helped here too
+                const deleteReq = await got.post(apiUrl, {
+                    form: new URLSearchParams({
+                        action: 'delete',
+                        title: file.title,
+                        token: csrfToken,
+                        format: 'json'
+                    }),
+                    headers: {
+                        'user-agent': pkg.name
+                    },
+                    cookieJar: jar
+                }).json();
+                if (deleteReq.error) {
+                    console.error(deleteReq.error)
+                }
+            }, 1000);
         }
-    }).catch(console.error);
+    });
 })();
