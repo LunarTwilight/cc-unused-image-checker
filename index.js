@@ -6,7 +6,7 @@ const lodash = require('lodash');
 const tough = require('tough-cookie');
 const jar = new tough.CookieJar();
 const pkg = require('./package.json');
-//require('merida').init();
+require('merida').init();
 
 //With help from https://github.com/siddharthvp/mwn/blob/3082515/src/bot.ts#L1477 and Doru's code
 const continuedQuery = async params => {
@@ -45,8 +45,7 @@ const mergeByName = arr => {
         .value();
 }
 
-//cron.schedule('0 0 */2 * *',
-(async () => {
+cron.schedule('0 0 */2 * *', async () => {
     const results = await continuedQuery({
         action: 'query',
         generator: 'allimages',
@@ -160,4 +159,4 @@ const mergeByName = arr => {
             }, 1000);
         }
     });
-})();
+});
