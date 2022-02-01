@@ -45,7 +45,7 @@ const mergeByName = arr => {
         .value();
 }
 
-cron.schedule('0 0 */2 * *', async () => {
+cron.schedule('0 * * * *', async () => {
     const results = await continuedQuery({
         action: 'query',
         generator: 'allimages',
