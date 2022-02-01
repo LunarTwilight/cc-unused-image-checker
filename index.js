@@ -133,7 +133,7 @@ cron.schedule('0 0 */2 * *', async () => {
             setTimeout(async () => {
                 await got.post(webhookUrl, {
                     json: {
-                        content: `Deleting \`${file.title}\` uploaded by \`${file.imageinfo[0].user}\` uploaded \`${file.imageinfo[0].timestamp}\``
+                        content: `Deleting \`${file.title}\` uploaded by \`${file.imageinfo[0].user}\` on \`${file.imageinfo[0].timestamp}\``
                     },
                     headers: {
                         'user-agent': pkg.name
