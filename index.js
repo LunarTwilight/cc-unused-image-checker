@@ -156,7 +156,7 @@ cron.schedule('0 0 */2 * *', async () => {
                 if (deleteReq.error) {
                     console.error(deleteReq.error)
                 }
-            }, 1000);
+            }, 5000);
         }
     });
 });
