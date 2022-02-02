@@ -125,38 +125,38 @@ cron.schedule('0 * * * *', async () => {
             }
             resolve(file);
         });
-    }).catch(console.error).then(checkedFiles => {
-        for (const file of checkedFiles) {
-            if (!file) {
-                return;
-            }
-            setTimeout(async () => {
-                await got.post(webhookUrl, {
-                    json: {
-                        content: `Deleting \`${file.title}\` uploaded by \`${file.imageinfo[0].user}\` on \`${file.imageinfo[0].timestamp}\``
-                    },
-                    headers: {
-                        'user-agent': pkg.name
-                    }
-                }).json();
-                //https://www.mediawiki.org/wiki/API:Delete#JavaScript helped here too
-                const deleteReq = await got.post(apiUrl, {
-                    form: new URLSearchParams({
-                        action: 'delete',
-                        title: file.title,
-                        token: csrfToken.query.tokens.csrftoken,
-                        reason: 'Deleting file that has been unused for 48 hours. If this is a mistake or you still need the file, please contact [[Message_wall:Sophiedp|Sophiedp]].',
-                        format: 'json'
-                    }),
-                    headers: {
-                        'user-agent': pkg.name
-                    },
-                    cookieJar: jar
-                }).json();
-                if (deleteReq.error) {
-                    console.error(deleteReq.error)
+    }).catch(console.error).then(async checkedFiles => {
+        checkedFiles = checkedFiles.filter(item => !!item);
+        const list = lodash.chunk(checkedFiles, 10);
+        list.forEach(async chunk => {
+            const group = chunk.map(item => `Deleting \`${item.title}\` by \`${item.imageinfo[0].user}\``);
+            await got.post(webhookUrl, {
+                json: {
+                    content: group.join('\n')
+                },
+                headers: {
+                    'user-agent': pkg.name
                 }
-            }, 5000);
+            }).json();
+        });
+        for (const file of checkedFiles) {
+            //https://www.mediawiki.org/wiki/API:Delete#JavaScript helped here too
+            const deleteReq = await got.post(apiUrl, {
+                form: new URLSearchParams({
+                    action: 'delete',
+                    title: file.title,
+                    token: csrfToken.query.tokens.csrftoken,
+                    reason: 'Deleting file that has been unused for 48 hours. If this is a mistake or you still need the file, please contact [[Message_wall:Sophiedp|Sophiedp]].',
+                    format: 'json'
+                }),
+                headers: {
+                    'user-agent': pkg.name
+                },
+                cookieJar: jar
+            }).json();
+            if (deleteReq.error) {
+                console.error(deleteReq.error)
+            }
         }
     });
 });
