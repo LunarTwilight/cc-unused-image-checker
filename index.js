@@ -15,7 +15,7 @@ const continuedQuery = async params => {
     while (true) {
         if (response.continue) {
             response = await got(apiUrl, {
-                searchParams: (!parts.length ? params : Object.assign({}, params, response.continue)),
+                searchParams: (parts.length ? ({ ...params, ...response.continue }) : params),
                 headers: {
                     'user-agent': pkg.name
                 }
@@ -34,13 +34,11 @@ const continuedQuery = async params => {
 const mergeByName = arr => {
     return lodash(arr)
         .groupBy(item => item.pageid)
-        .map(function (group) {
-            return lodash.mergeWith.apply(lodash, [{}].concat(group, function (obj, src) {
-                if (Array.isArray(obj)) {
-                    return obj.concat(src);
-                }
-            }))
-        })
+        .map(group => lodash.mergeWith(...[{}].concat(group, (obj, src) => {
+            if (Array.isArray(obj)) {
+                return obj.concat(src);
+            }
+        })))
         .values()
         .value();
 }
@@ -126,7 +124,7 @@ cron.schedule('0 * * * *', async () => {
             resolve(file);
         });
     }).catch(console.error).then(async checkedFiles => {
-        checkedFiles = checkedFiles.filter(item => !!item);
+        checkedFiles = checkedFiles.filter(item => Boolean(item));
         const list = lodash.chunk(checkedFiles, 10);
         list.forEach(async chunk => {
             const group = chunk.map(item => `Deleting \`${item.title}\` by \`${item.imageinfo[0].user}\``);
