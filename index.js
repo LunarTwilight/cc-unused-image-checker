@@ -105,7 +105,7 @@ cron.schedule('0 * * * *', async () => {
         cookieJar: jar
     }).json();
     batch(unusedFiles, 10, file => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async resolve => {
             const data = await got(apiUrl, {
                 searchParams: {
                     action: 'query',
