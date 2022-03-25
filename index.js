@@ -28,20 +28,18 @@ const continuedQuery = async params => {
             return parts;
         }
     }
-}
+};
 
 //https://stackoverflow.com/a/40486595
-const mergeByName = arr => {
-    return lodash(arr)
-        .groupBy(item => item.pageid)
-        .map(group => lodash.mergeWith(...[{}].concat(group, (obj, src) => {
-            if (Array.isArray(obj)) {
-                return obj.concat(src);
-            }
-        })))
-        .values()
-        .value();
-}
+const mergeByName = arr => lodash(arr)
+    .groupBy(item => item.pageid)
+    .map(group => lodash.mergeWith(...[{}].concat(group, (obj, src) => {
+        if (Array.isArray(obj)) {
+            return obj.concat(src);
+        }
+    })))
+    .values()
+    .value();
 
 cron.schedule('0 * * * *', async () => {
     const results = await continuedQuery({
@@ -104,26 +102,24 @@ cron.schedule('0 * * * *', async () => {
         },
         cookieJar: jar
     }).json();
-    batch(unusedFiles, 10, file => {
-        return new Promise(async resolve => {
-            const data = await got(apiUrl, {
-                searchParams: {
-                    action: 'query',
-                    list: 'users',
-                    ususers: file.imageinfo[0].user,
-                    usprop: 'groups|editcount',
-                    format: 'json'
-                },
-                headers: {
-                    'user-agent': pkg.name
-                }
-            }).json();
-            if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join()) || data.query.users[0].editcount >= 50) {
-                resolve();
+    batch(unusedFiles, 10, file => new Promise(async resolve => {
+        const data = await got(apiUrl, {
+            searchParams: {
+                action: 'query',
+                list: 'users',
+                ususers: file.imageinfo[0].user,
+                usprop: 'groups|editcount',
+                format: 'json'
+            },
+            headers: {
+                'user-agent': pkg.name
             }
-            resolve(file);
-        });
-    }).catch(console.error).then(async checkedFiles => {
+        }).json();
+        if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join()) || data.query.users[0].editcount >= 50) {
+            resolve();
+        }
+        resolve(file);
+    })).catch(console.error).then(async checkedFiles => {
         checkedFiles = checkedFiles.filter(item => Boolean(item));
         const list = lodash.chunk(checkedFiles, 10);
         list.forEach(async chunk => {
@@ -153,7 +149,7 @@ cron.schedule('0 * * * *', async () => {
                 cookieJar: jar
             }).json();
             if (deleteReq.error) {
-                console.error(deleteReq.error)
+                console.error(deleteReq.error);
             }
         }
     });
