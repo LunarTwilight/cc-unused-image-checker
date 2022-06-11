@@ -1,5 +1,4 @@
 const { username, password, apiUrl, webhookUrl } = require('./config.json');
-const cron = require('node-cron');
 const got = require('grb');
 const batch = require('batch-iterator');
 const lodash = require('lodash');
@@ -41,7 +40,7 @@ const mergeByName = arr => lodash(arr)
     .values()
     .value();
 
-cron.schedule('0 * * * *', async () => {
+(async () => {
     const results = await continuedQuery({
         action: 'query',
         generator: 'allimages',
@@ -153,4 +152,4 @@ cron.schedule('0 * * * *', async () => {
             }
         }
     });
-});
+})();
