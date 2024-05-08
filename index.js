@@ -107,14 +107,14 @@ const mergeByName = arr => lodash(arr)
                 action: 'query',
                 list: 'users',
                 ususers: file.imageinfo[0].user,
-                usprop: 'groups|editcount',
+                usprop: 'groups',
                 format: 'json'
             },
             headers: {
                 'user-agent': pkg.name
             }
         }).json();
-        if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join()) || data.query.users[0].editcount >= 50) {
+        if (/sysop|soap|staff|helper|global-discussions-moderator|wiki-representative|wiki-specialist/.test(data.query.users[0].groups.join())) {
             resolve();
         }
         resolve(file);
