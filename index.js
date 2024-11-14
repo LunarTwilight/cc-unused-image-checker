@@ -76,10 +76,10 @@ const mergeByName = arr => lodash(arr)
         gaiend: (new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString()),
         gailimit: 'max',
         prop: 'linkshere|transcludedin|fileusage|imageinfo|categories',
-        /*cllimit: 1,
+        cllimit: 1,
         fulimit: 1,
         lhlimit: 1,
-        tilimit: 1,*/
+        tilimit: 1,
         formatversion: 2,
         format: 'json'
     });
