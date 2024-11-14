@@ -17,7 +17,8 @@ const continuedQuery = async params => {
                 searchParams: (parts.length ? ({ ...params, ...response.continue }) : params),
                 headers: {
                     'user-agent': pkg.name
-                }
+                },
+                cookieJar: jar
             }).json();
             if (response.error) {
                 throw new Error(response.error);
