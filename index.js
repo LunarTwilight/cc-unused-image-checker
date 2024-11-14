@@ -42,29 +42,6 @@ const mergeByName = arr => lodash(arr)
     .value();
 
 (async () => {
-    const results = await continuedQuery({
-        action: 'query',
-        generator: 'allimages',
-        gaisort: 'timestamp',
-        gaistart: (new Date(Date.now() - (4 * 24 * 60 * 60 * 1000)).toISOString()),
-        gaiend: (new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString()),
-        gailimit: 'max',
-        prop: 'linkshere|transcludedin|fileusage|imageinfo|categories',
-        /*cllimit: 1,
-        fulimit: 1,
-        lhlimit: 1,
-        tilimit: 1,*/
-        formatversion: 2,
-        format: 'json'
-    });
-    if (!results.length) {
-        return console.log('No results, aborting');
-    }
-    const files = mergeByName(results);
-    const unusedFiles = files.filter(item => !item.linkswhere && !item.transcludedin && !item.fileusage && !item.categories);
-    if (!unusedFiles.length) {
-        return console.log('No unused files, aborting');
-    }
     //with help from https://www.mediawiki.org/wiki/API:Delete#JavaScript
     const logonToken = await got(apiUrl, {
         searchParams: {
@@ -91,6 +68,30 @@ const mergeByName = arr => lodash(arr)
         },
         cookieJar: jar
     });
+    const results = await continuedQuery({
+        action: 'query',
+        generator: 'allimages',
+        gaisort: 'timestamp',
+        gaistart: (new Date(Date.now() - (4 * 24 * 60 * 60 * 1000)).toISOString()),
+        gaiend: (new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString()),
+        gailimit: 'max',
+        prop: 'linkshere|transcludedin|fileusage|imageinfo|categories',
+        /*cllimit: 1,
+        fulimit: 1,
+        lhlimit: 1,
+        tilimit: 1,*/
+        formatversion: 2,
+        format: 'json'
+    });
+    if (!results.length) {
+        return console.log('No results, aborting');
+    }
+    const files = mergeByName(results);
+    const unusedFiles = files.filter(item => !item.linkswhere && !item.transcludedin && !item.fileusage && !item.categories);
+    if (!unusedFiles.length) {
+        return console.log('No unused files, aborting');
+    }
+    //with help from https://www.mediawiki.org/wiki/API:Delete#JavaScript
     const csrfToken = await got(apiUrl, {
         searchParams: {
             action: 'query',
