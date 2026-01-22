@@ -19,7 +19,7 @@
   "dependencies": {
     "batch-iterator": "^1.5.0",
     "grb": "^0.1.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "merida": "^2.0.8",
     "tough-cookie": "^6.0.0"
   }
